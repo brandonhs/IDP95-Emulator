@@ -1,0 +1,6 @@
+[
+    {
+        "key": "ctrl+s",          
+        "command": "workbench.action.tasks.build" 
+    }
+]

@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "outDir": "./dist",
+        "noImplicitAny": true,
+        "resolveJsonModule": true,
+        "module": "es6",
+        "target": "es6",
+        "lib": ["ES6", "DOM"],
+        "allowJs": true,
+        "moduleResolution": "node"
+    },
+    "include": [
+        "./node_modules/@downpourdigital/bmfont-loader/dist/import.d.ts",
+        "./src/index.d.ts"
+    ]
+}
