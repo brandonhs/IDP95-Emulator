@@ -9,6 +9,7 @@ import crosswordImageUrl from '../../../assets/crossword.png';
 import crosswordSvgUrl from '../../../assets/crossword.svg';
 import { Emulator } from "../../emulator/emulator";
 import { EmulatorFontManager, FontType } from "../../emulator/text/manager";
+import { EmulatorFont } from "../../emulator/text/font";
 
 export class CrosswordHints extends EmulatorElement {
 
@@ -48,6 +49,8 @@ export class CrosswordBox extends EmulatorElement {
 
     private _col: number;
     private _row: number;
+    private _text: string;
+    private _font: EmulatorFont;
 
     constructor(x: number, y: number, width: number, height: number, col: number, row: number) {
         super({
@@ -55,6 +58,27 @@ export class CrosswordBox extends EmulatorElement {
         }, EmulatorBitmap.createEmpty(width, height).fill(15));
         this._col = col;
         this._row = row;
+
+        this._font = EmulatorFontManager.getFont(FontType.NormalBold);
+
+        this._text = '';
+    }
+
+    set text(newText) {
+        this._text = newText;
+    }
+
+    get bitmap() {
+        var bitmap = new EmulatorBitmap(this._bitmap);
+        var data = this._font.getCharacterData(this.text.charAt(0));
+        if (data) {
+            bitmap = bitmap.blit(this._font.layout(this._text).replace(15, 0), Math.floor(this._bitmap.width/2-data.width/2), Math.floor(this._bitmap.height/2-this._font.lineHeight/2));
+        }
+        return bitmap;
+    }
+
+    get text() {
+        return this._text;
     }
 
     get col() {
@@ -77,8 +101,11 @@ export class CrosswordWindow extends EmulatorWindow {
     private _crosswordHints: CrosswordHints;
     private _selectedBox: CrosswordBox;
 
+    private _selectedIndex: number;
+
     private _letters: string[];
     private _letterWidth: number;
+    private _boxIndices: number[];
 
     constructor(transform: IElementTransform, crosswordSvg: XMLDocument) {
         var svg = crosswordSvg.getElementsByTagName('svg')[0];
@@ -86,7 +113,6 @@ export class CrosswordWindow extends EmulatorWindow {
         var height = Math.floor(parseFloat(svg.getAttribute('data-height')));
 
         super(transform, width, height+20, 'Crossword');
-        
         
         this._hintsWindow = new EmulatorWindow({
             offsetX: 10, offsetY: 10, zIndex: 20
@@ -110,6 +136,8 @@ export class CrosswordWindow extends EmulatorWindow {
         
         let maxRow = 0;
         let maxCol = 0;
+
+        this._boxIndices = [];
         
         let elements = crosswordSvg.getElementsByTagName('g');
         let font = EmulatorFontManager.getFont(FontType.NormalBold);
@@ -131,7 +159,9 @@ export class CrosswordWindow extends EmulatorWindow {
             let boxElement = new CrosswordBox(x, y+this.titleBarHeight, w, h, col, row);
             boxElement.onclick = () => {
                 this._selectedBox = boxElement;
+                this._selectedIndex = this._elements.indexOf(boxElement);
             }
+            this._boxIndices.push(this._elements.length-1);
             this.addChild(boxElement);
             
             let text = g.getElementsByTagName('text')[0];
@@ -151,17 +181,21 @@ export class CrosswordWindow extends EmulatorWindow {
 
         this._letterWidth = maxCol;
         this._letters = new Array(maxCol * maxRow);
+        this._letters = this._letters.fill(' ');
     }
 
     sendKey(key: string) {
-        let font = EmulatorFontManager.getFont(FontType.NormalBold);
         if (this._selectedBox) {
             let index = this._selectedBox.col + this._selectedBox.row * this._letterWidth;
             this._letters[index] = key;
-            console.log(this._letters);
+            this._selectedBox.text = key;
+            this._selectedIndex = this._elements.indexOf(this._selectedBox)+2;
+            this._selectedBox = <CrosswordBox>this._elements[this._selectedIndex];
+            console.log(this._selectedIndex);
+            console.log(this._letters.toString());
         }
     }
-    
+
     static async create(transform: IElementTransform) {
         var crosswordImage = await getSvg(crosswordSvgUrl, crosswordImageUrl);
         return new CrosswordWindow(transform, crosswordImage.element);

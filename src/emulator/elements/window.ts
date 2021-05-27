@@ -7,7 +7,7 @@ import * as EmulatorIcons from './icons';
 
 export class EmulatorWindow extends EmulatorElement {
 
-    private _elements: EmulatorElement[];
+    protected _elements: EmulatorElement[];
 
     private _closeElement: EmulatorButton;
     private _titleBarElement: EmulatorElement;
