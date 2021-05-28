@@ -23,29 +23,17 @@ export function makeRequest(method: string, url: string) {
     });
 }
 
-export interface ISvgData {
-    element: Document,
-    image: HTMLImageElement
-}
-
-export function getSvg(svgUrl: string, imageUrl: string) {
-    return new Promise<ISvgData>(function (resolve, reject) {
-        let image = new Image();
-        image.src = imageUrl;
-
-        image.onload = function() {
-            let xhr = new XMLHttpRequest();
-            xhr.responseType = 'document';
-            xhr.open('GET', svgUrl);
-            xhr.onload = function () {
-                if (this.status >= 200 && this.status < 300) {
-                    resolve({
-                        image: image, element: this.responseXML
-                    });
-                }
-            };
-            xhr.send();
-        }
+export function getSvg(svgUrl: string) {
+    return new Promise<Document>(function (resolve, reject) {
+        let xhr = new XMLHttpRequest();
+        xhr.responseType = 'document';
+        xhr.open('GET', svgUrl);
+        xhr.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(this.responseXML);
+            }
+        };
+        xhr.send();
     });
 }
 

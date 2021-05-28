@@ -5,7 +5,6 @@ import { EmulatorWindow } from "../../emulator/elements/window";
 import { IBitmapPalette } from "../../emulator/renderer";
 import { getImage, getSvg } from "../../utils/requests";
 
-import crosswordImageUrl from '../../../assets/crossword.png';
 import crosswordSvgUrl from '../../../assets/crossword2.svg';
 import { Emulator } from "../../emulator/emulator";
 import { EmulatorFontManager, FontType } from "../../emulator/text/manager";
@@ -249,8 +248,8 @@ export class CrosswordWindow extends EmulatorWindow {
     }
 
     static async create(transform: IElementTransform) {
-        var crosswordImage = await getSvg(crosswordSvgUrl, crosswordImageUrl);
-        return new CrosswordWindow(transform, crosswordImage.element);
+        var crosswordImage = await getSvg(crosswordSvgUrl);
+        return new CrosswordWindow(transform, crosswordImage);
     }
 
 }
