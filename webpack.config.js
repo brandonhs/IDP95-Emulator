@@ -1,7 +1,16 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.ts',
+    entry: {
+        main: {
+            import: './src/index.ts',
+            filename: 'bundle.js'
+        },
+        art: {
+            import: './src/art.ts',
+            filename: 'art.js'
+        },
+    },
     devtool: 'inline-source-map',
     module: {
         rules: [
