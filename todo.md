@@ -13,7 +13,7 @@
 - [ ] Crossword
     - [x] Window
     - [x] Image Background
-    - [ ] Interactive Elements
+    - [x] Interactive Elements
     - [ ] Hints
         - [x] Window
         - [ ] Get Hints from room

@@ -6,14 +6,14 @@ import { IBitmapPalette } from "../../emulator/renderer";
 import { getImage, getSvg } from "../../utils/requests";
 
 import crosswordImageUrl from '../../../assets/crossword.png';
-import crosswordSvgUrl from '../../../assets/crossword.svg';
+import crosswordSvgUrl from '../../../assets/crossword2.svg';
 import { Emulator } from "../../emulator/emulator";
 import { EmulatorFontManager, FontType } from "../../emulator/text/manager";
 import { EmulatorFont } from "../../emulator/text/font";
 
 export class CrosswordHints extends EmulatorElement {
 
-    constructor(transform: IElementTransform, width: number, hintsDown: string[], hintsAcross: string[]) {
+    constructor(transform: IElementTransform, width: number, hintsAcross: string[], hintsDown: string[]) {
         let labelFont = EmulatorFontManager.getFont(FontType.NormalBold);
         let hintFont = EmulatorFontManager.getFont(FontType.Normal);
         super(transform, EmulatorBitmap.createEmpty(width, (hintsDown.length + hintsAcross.length) * hintFont.lineHeight + 2 * labelFont.lineHeight));
@@ -24,7 +24,7 @@ export class CrosswordHints extends EmulatorElement {
         offsetY += labelFont.lineHeight;
         let n = 1;
         for (let across of hintsAcross) {
-            let acrossLayout = hintFont.layout('    ' + n + '. ' + across);
+            let acrossLayout = hintFont.layout('    ' + across);
             this._bitmap = this._bitmap.blit(acrossLayout, 0, offsetY);
             offsetY += hintFont.lineHeight;
             n++;
@@ -35,7 +35,7 @@ export class CrosswordHints extends EmulatorElement {
         offsetY += labelFont.lineHeight;
         n = 1;
         for (let down of hintsDown) {
-            let downLayout = hintFont.layout('    ' + n + '. ' + down);
+            let downLayout = hintFont.layout('    ' + down);
             this._bitmap = this._bitmap.blit(downLayout, 0, offsetY);
             offsetY += hintFont.lineHeight;
             n++;
@@ -51,13 +51,19 @@ export class CrosswordBox extends EmulatorElement {
     private _row: number;
     private _text: string;
     private _font: EmulatorFont;
+    public index: number;
+    public selected: boolean;
 
-    constructor(x: number, y: number, width: number, height: number, col: number, row: number) {
+    constructor(x: number, y: number, width: number, height: number, col: number, row: number, index: number) {
         super({
             offsetX: x, offsetY: y, zIndex: 10
         }, EmulatorBitmap.createEmpty(width, height).fill(15));
         this._col = col;
         this._row = row;
+
+        this.index = index;
+
+        this.selected = false;
 
         this._font = EmulatorFontManager.getFont(FontType.NormalBold);
 
@@ -69,7 +75,7 @@ export class CrosswordBox extends EmulatorElement {
     }
 
     get bitmap() {
-        var bitmap = new EmulatorBitmap(this._bitmap);
+        var bitmap = new EmulatorBitmap(this._bitmap).fill(this.selected ? 40 : 15);
         var data = this._font.getCharacterData(this.text.charAt(0));
         if (data) {
             bitmap = bitmap.blit(this._font.layout(this._text).replace(15, 0), Math.floor(this._bitmap.width/2-data.width/2), Math.floor(this._bitmap.height/2-this._font.lineHeight/2));
@@ -103,8 +109,9 @@ export class CrosswordWindow extends EmulatorWindow {
 
     private _selectedIndex: number;
 
-    private _letters: string[];
+    private _letters: string[][];
     private _letterWidth: number;
+    private _maxIndex: number;
     private _boxIndices: number[];
 
     constructor(transform: IElementTransform, crosswordSvg: XMLDocument) {
@@ -121,13 +128,13 @@ export class CrosswordWindow extends EmulatorWindow {
         this._crosswordHints = new CrosswordHints({
             offsetX: 0, offsetY: this.titleBarHeight, zIndex: 0
         }, this._hintsWindow.bitmap.width, [
-            'What goes up when rain comes down?',
-            'What is full of holes but still holds water?',
-            'What was pacman\'s original name?',
-            'What color is pacman?',
+            '2. What was pacman\'s original name?',
+            '4. What is full of holes but still holds water?',
+            '5. What goes up when rain comes down?',
+            '6. What do you bury alive and dig up when dead?',
         ], [
-            'What do you bury alive and dig up when dead?',
-            'What word is always pronounced incorrectly?',
+            '1. What word is always pronounced incorrectly?',
+            '3. What color is pacman?',
         ]);
         
         this._hintsWindow.addChild(this._crosswordHints);
@@ -141,7 +148,8 @@ export class CrosswordWindow extends EmulatorWindow {
         
         let elements = crosswordSvg.getElementsByTagName('g');
         let font = EmulatorFontManager.getFont(FontType.NormalBold);
-        for (let i = 0; i < elements.length; i++) {
+        let i: number;
+        for (i = 0; i < elements.length; i++) {
             let g = elements[i];
             let rect = g.getElementsByTagName('rect')[0];
             let x = parseInt(rect.getAttribute('x'))+2;
@@ -156,8 +164,12 @@ export class CrosswordWindow extends EmulatorWindow {
             maxCol = Math.max(col, maxCol);
             maxRow = Math.max(row, maxRow);
             
-            let boxElement = new CrosswordBox(x, y+this.titleBarHeight, w, h, col, row);
+            let boxElement = new CrosswordBox(x, y+this.titleBarHeight, w, h, col, row, i);
             boxElement.onclick = () => {
+                if (this._selectedBox) {
+                    this._selectedBox.selected = false;
+                }
+                boxElement.selected = true;
                 this._selectedBox = boxElement;
                 this._selectedIndex = this._elements.indexOf(boxElement);
             }
@@ -179,20 +191,60 @@ export class CrosswordWindow extends EmulatorWindow {
             this.addChild(numberElement);
         }
 
+        this._maxIndex = i;
+
         this._letterWidth = maxCol;
-        this._letters = new Array(maxCol * maxRow);
-        this._letters = this._letters.fill(' ');
+        this._letters = 
+            new Array(maxRow+1).fill(null).map(() => 
+            new Array(maxCol+1).fill(null).map(() => ' '));
     }
 
-    sendKey(key: string) {
+    sendKey(key: string, dif=2) {
         if (this._selectedBox) {
-            let index = this._selectedBox.col + this._selectedBox.row * this._letterWidth;
-            this._letters[index] = key;
-            this._selectedBox.text = key;
-            this._selectedIndex = this._elements.indexOf(this._selectedBox)+2;
-            this._selectedBox = <CrosswordBox>this._elements[this._selectedIndex];
-            console.log(this._selectedIndex);
-            console.log(this._letters.toString());
+            if (key.length <= 1) {
+                this._letters[this._selectedBox.row][this._selectedBox.col] = key;
+                this._selectedBox.selected = false;
+                this._selectedBox.text = key;
+                this._selectedIndex = this._elements.indexOf(this._selectedBox)+dif;
+                if (this._selectedIndex <= 0) {
+                    this._selectedIndex = this._elements.findIndex((element) => {
+                        if (element instanceof CrosswordBox) {
+                            return element.index === this._maxIndex-1;
+                        }
+                        return false;
+                    });
+                }
+                if (this._selectedIndex >= this._elements.length) {
+                    this._selectedIndex = this._elements.findIndex((element) => {
+                        if (element instanceof CrosswordBox) {
+                            return element.index === 0;
+                        }
+                        return false;
+                    });
+                }
+                this._selectedBox = <CrosswordBox>this._elements[this._selectedIndex];
+                this._selectedBox.selected = true;
+                let res = '';
+                for (let row = 0; row < this._letters.length; row++) {
+                    for (let col = 0; col < this._letters[row].length; col++) {
+                        res += this._letters[row][col] || ' ';
+                    }
+                    res += '\n';
+                }
+                console.log(res);
+            } else if (key.match('Backspace')) {
+                var last = this._letters[this._selectedBox.row][this._selectedBox.col] === ' ';
+                if (last || this._letters[this._selectedBox.row][this._selectedBox.col].length === 0) {
+                    this.sendKey(' ', -2);
+                    this.sendKey(' ', 0);
+                } else {
+                    this.sendKey('', 0);
+                }
+            } else if (key === 'ArrowLeft') {
+                this.sendKey(this._letters[this._selectedBox.row][this._selectedBox.col] || ' ', -2);
+            } else if (key === 'ArrowRight') {
+                this.sendKey(this._letters[this._selectedBox.row][this._selectedBox.col] || ' ', 2);
+            }
         }
     }
 

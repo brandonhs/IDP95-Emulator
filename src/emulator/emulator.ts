@@ -41,15 +41,14 @@ export class Emulator {
         }
 
         window.onkeydown = (e: KeyboardEvent) => {
-            console.log(e.key);
-            if (e.key.length > 1) return;
-
             this._elements.sort((a, b) => b.sort(a));
             for (let element of this._elements) {
                 if (element instanceof EmulatorWindow) {
                     element.sendKey(e.key);
+                    break;
                 }
             }
+            e.preventDefault();
         };
 
         this.renderer.canvas.onmouseup = (e) => {
