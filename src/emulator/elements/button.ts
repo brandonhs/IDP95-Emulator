@@ -18,6 +18,7 @@ export class EmulatorButton extends EmulatorElement {
     }
 
     handleMouseDown() {
+        this.onclick();
         this._isClicked = true;
         this._selected = this._bitmapDown;
     }

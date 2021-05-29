@@ -11,8 +11,11 @@ import * as segoeUI16BlackData from '../assets/segoe_ui_black_16.json';
 import * as segoeUI9Data from '../assets/segoe_ui_9.json';
 
 import room from '../assets/room.png';
-
-import background from '../assets/background1024.jpg';
+import umbrella from '../assets/umbrella.png';
+import carpet from '../assets/carpet.png';
+import plant from '../assets/plant.png';
+import painting from '../assets/painting.png';
+import desk from '../assets/desk.png';
 
 import { EmulatorWindow } from './emulator/elements/window';
 import { EmulatorTaskBar } from './emulator/elements/taskbar';
@@ -50,10 +53,17 @@ document.body.onload = () => {
         });
         emulator.addElement(mailWindow);
 
-        // var roomWindow = new RoomWindow({
-        //     offsetX: 50, offsetY: 50, zIndex: 50
-        // }, await getImage(room), palette);
-        // emulator.addElement(roomWindow);
+        var roomWindow = new RoomWindow({
+            offsetX: 50, offsetY: 50, zIndex: 50
+        }, {
+            background: EmulatorBitmap.loadImageFromHTML(await getImage(room), palette),
+            umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
+            carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
+            painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
+            plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
+            desk:       EmulatorBitmap.loadImageFromHTML(await getImage(desk), palette),
+        });
+        emulator.addElement(roomWindow);
 
         new EmulatorPaletteView((() => {
             var div = document.createElement('div');

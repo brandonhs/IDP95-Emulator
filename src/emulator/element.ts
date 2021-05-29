@@ -38,6 +38,10 @@ export class EmulatorElement {
                 offsetX: 0, offsetY: 0, zIndex: 0
             });
         }
+        let ox = x - (parent.position.x + this.position.x);
+        let oy = y - (parent.position.y + this.position.y);
+        let a = this.bitmap.mask[ox + oy * this.bitmap.width];
+        if (a > 0) return false;
         if (x >= this.position.x + parent.position.x && y >= this.position.y + parent.position.y && x <= this.position.x + parent.position.x + this.bitmap.width && y <= this.position.y + parent.position.y + this.bitmap.height) {
             return true;
         }

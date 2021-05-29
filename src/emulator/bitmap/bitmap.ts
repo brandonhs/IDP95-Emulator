@@ -96,6 +96,7 @@ export class EmulatorBitmap {
             var r = image.data[i + 0];
             var g = image.data[i + 1];
             var b = image.data[i + 2];
+            var a = image.data[i + 3];
 
             let totalDif = 1000;
             let color = palette[0];
@@ -110,6 +111,7 @@ export class EmulatorBitmap {
             });
 
             bitmap.bitmap[i/4] = color.colorId;
+            bitmap.mask[i/4] = 1 -  Math.round(a / 255);
         }
         return bitmap;
     }
