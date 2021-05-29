@@ -13,6 +13,7 @@ export interface IRoomImages {
     painting: EmulatorBitmap,
     plant: EmulatorBitmap,
     desk: EmulatorBitmap,
+    supplies: EmulatorBitmap,
 }
 
 export class RoomWindow extends EmulatorWindow {
@@ -22,12 +23,17 @@ export class RoomWindow extends EmulatorWindow {
     private _painting: EmulatorButton;
     private _plant: EmulatorButton;
     private _desk: EmulatorButton;
+    private _supplies: EmulatorButton;
 
     constructor(transform: IElementTransform, images: IRoomImages) {
         super(transform, images.background.width, images.background.height, 'Pacman - mWAHAHAHHAHAHHA');
 
         this.setBackground(images.background);
-
+        this._supplies = new EmulatorButton({
+            offsetX: 60, offsetY: this.bitmap.height-images.desk.height-50, zIndex: -1
+        }, images.supplies);
+        this.addChild(this._supplies);
+        
         this._umbrella = new EmulatorButton({
             offsetX: 10, offsetY: this._bitmap.height-images.umbrella.height-10, zIndex: 1
         }, images.umbrella);

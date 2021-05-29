@@ -16,6 +16,7 @@ import carpet from '../assets/carpet.png';
 import plant from '../assets/plant.png';
 import painting from '../assets/painting.png';
 import desk from '../assets/desk.png';
+import supplies from '../assets/supplies.png';
 
 import { EmulatorWindow } from './emulator/elements/window';
 import { EmulatorTaskBar } from './emulator/elements/taskbar';
@@ -62,6 +63,7 @@ document.body.onload = () => {
             painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
             plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
             desk:       EmulatorBitmap.loadImageFromHTML(await getImage(desk), palette),
+            supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
         });
         emulator.addElement(roomWindow);
 
