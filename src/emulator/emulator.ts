@@ -9,6 +9,11 @@ export class Emulator {
     private _elements: EmulatorElement[];
     private _renderer: BitmapRenderer;
     private _mouseDown: boolean;
+    private _cycleCount: number;
+
+    get cycles() {
+        return this._cycleCount;
+    }
 
     constructor(palette = BitmapRenderer.loadPalette()) {
         this._screenBitmap = EmulatorBitmap.createEmpty(800, 600);

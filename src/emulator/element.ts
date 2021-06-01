@@ -13,12 +13,24 @@ export class EmulatorElement {
     protected _transform: IElementTransform;
     public onclick: () => void;
 
+    private _visible: boolean;
+
     constructor(transform: IElementTransform, bitmap: EmulatorBitmap = null, parent: EmulatorElement = null) {
         this._transform = transform;
         this._bitmap = bitmap || EmulatorBitmap.createEmpty();
         this._parent = parent;
 
+        this._visible = true;
+
         this.onclick = () => { }
+    }
+
+    show() {
+        this._visible = true;
+    }
+
+    hide() {
+        this._visible = false;
     }
 
     setIndex(index: number) {
@@ -61,7 +73,11 @@ export class EmulatorElement {
     }
 
     get bitmap() : EmulatorBitmap {
-        return new EmulatorBitmap(this._bitmap);
+        if (this._visible) {
+            return new EmulatorBitmap(this._bitmap);
+        } else {
+            return EmulatorBitmap.createEmpty(this._bitmap.width, this._bitmap.height).fillMask(1);
+        }
     }
 
     set bitmap(newBitmap: EmulatorBitmap) {

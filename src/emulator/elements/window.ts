@@ -59,6 +59,7 @@ export class EmulatorWindow extends EmulatorElement {
         } else {
             this._elements.push(element);
         }
+        return element;
     }
 
     containsMouseInTitleBar(x: number, y: number) : boolean {

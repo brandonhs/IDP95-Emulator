@@ -6,6 +6,8 @@ export class EmulatorButton extends EmulatorElement {
     protected _bitmapNormal: EmulatorBitmap;
     protected _bitmapDown: EmulatorBitmap;
 
+    public id: number;
+
     protected _isClicked: boolean;
     protected _selected: EmulatorBitmap;
 
@@ -14,7 +16,8 @@ export class EmulatorButton extends EmulatorElement {
         this._bitmapNormal = bitmapNormal;
         this._bitmapDown = bitmapDown;
         this._isClicked = false;
-        this._selected = this._bitmapNormal
+        this._selected = this._bitmapNormal;
+        this.id = 0;
     }
 
     handleMouseDown() {
