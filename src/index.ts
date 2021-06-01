@@ -16,6 +16,7 @@ import carpet from '../assets/carpet.png';
 import plant from '../assets/plant.png';
 import painting from '../assets/painting.png';
 import desk from '../assets/desk.png';
+import deskTop from '../assets/desk_top3.png';
 import supplies from '../assets/supplies.png';
 
 import { EmulatorWindow } from './emulator/elements/window';
@@ -43,16 +44,19 @@ document.body.onload = () => {
 
         EmulatorFontManager.addFont(FontType.Normal, await EmulatorFont.loadFont(<IFont>segoeUI16Data, palette));
         EmulatorFontManager.addFont(FontType.NormalBold, await EmulatorFont.loadFont(<IFont>arial16boldData, palette));
-        
-        var crosswordWindow = await CrosswordWindow.create({
-            offsetX: 10, offsetY: 225, zIndex: 40
-        });
-        emulator.addElement(crosswordWindow);
 
         // let mailWindow = new MailWindow({
         //     offsetX: 20, offsetY: 50, zIndex: 5
         // });
         // emulator.addElement(mailWindow);
+
+        var crosswordWindow = await CrosswordWindow.create({
+            offsetX: 10, offsetY: 225, zIndex: 40
+        });
+
+        var deskElement = new EmulatorElement({
+            offsetX: 0, offsetY: 20, zIndex: 10
+        }, EmulatorBitmap.loadImageFromHTML(await getImage(deskTop), palette));
 
         var roomWindow = new RoomWindow({
             offsetX: 425, offsetY: 75, zIndex: 50
@@ -64,14 +68,14 @@ document.body.onload = () => {
             plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
             desk:       EmulatorBitmap.loadImageFromHTML(await getImage(desk), palette),
             supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
-        }, [
-            '2. What was pacman\'s original name?',
-            '4. What is full of holes but still holds water?',
-            '5. What goes up when rain comes down?',
-            '6. What do you bury alive and dig up when dead?',
-            '1. What word is always pronounced incorrectly?',
-            '3. What color is pacman?',
-        ]);
+        }, {
+            umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
+            carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
+            painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
+            plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
+            desk:       deskElement,
+            supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
+        }, crosswordWindow);
         emulator.addElement(roomWindow);
 
         new EmulatorPaletteView((() => {

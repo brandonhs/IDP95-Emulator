@@ -9,20 +9,24 @@ export class EmulatorWindow extends EmulatorElement {
 
     protected _elements: EmulatorElement[];
 
-    private _closeElement: EmulatorButton;
+    protected _closeElement: EmulatorButton;
     private _titleBarElement: EmulatorElement;
     private _titleFont: EmulatorFont;
     private _dragging: boolean;
     private _subWindows: EmulatorWindow[];
 
+    public noClose: boolean;
+
     private _titleBarHeight: number;
 
     onclose: () => void;
 
-    constructor(transform: IElementTransform, width: number, height: number, title: string = 'Window') {
+    constructor(transform: IElementTransform, width: number, height: number, title: string = 'Window', noclose=false) {
         super(transform, EmulatorBitmap.createEmpty(width, height));
         this._elements = [];
         this._subWindows = [];
+
+        this.noClose = noclose;
 
         this._titleFont = EmulatorFontManager.getFont(FontType.Normal)
         var titleBarTitle = this._titleFont.layout(title);

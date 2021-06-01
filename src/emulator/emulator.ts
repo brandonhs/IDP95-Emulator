@@ -121,7 +121,7 @@ export class Emulator {
 
     addElement(element: EmulatorElement) {
         this._elements.push(element);
-        if (element instanceof EmulatorWindow) {
+        if (element instanceof EmulatorWindow && !element.noClose) {
             element.onclose = () => {
                 this._elements.splice(this._elements.indexOf(element), 1);
             }
