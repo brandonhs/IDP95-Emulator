@@ -1,4 +1,5 @@
 import { Demontavious } from '../game/characters/demontavious';
+import { IPuzzle } from '../game/puzzle';
 import { DialogWindow } from '../game/windows/dialog';
 import { EmulatorTerminal } from '../game/windows/terminal';
 import { EmulatorBitmap } from './bitmap/bitmap';
@@ -15,6 +16,8 @@ export class Emulator {
     private _mouseDown: boolean;
     private _cycleCount: number;
     private _demontavious: Demontavious;
+
+    private _puzzles: IPuzzle[];
     
     private _puzzleIndex: number = 0;
 
@@ -35,6 +38,8 @@ export class Emulator {
         this._demontavious = new Demontavious({
             offsetX: this._screenBitmap.width-40, offsetY: this._screenBitmap.height-40, zIndex: Infinity
         });
+
+        this._puzzles = [];
         
         this._mouseDown = false;
         
@@ -105,8 +110,8 @@ export class Emulator {
     }
 
     next() {
+        this._elements = this._puzzles[this._puzzleIndex].elements;
         this._puzzleIndex++;
-        console.log('nextttt');
     }
 
     openDialog(text: string) {
@@ -159,6 +164,10 @@ export class Emulator {
 
     write(text: string) {
         this.terminal.write(text);
+    }
+
+    addPuzzle(puzzle: IPuzzle) {
+        this._puzzles.push(puzzle);
     }
 
     addElement(element: EmulatorElement) {

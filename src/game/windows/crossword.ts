@@ -120,25 +120,25 @@ export class CrosswordWindow extends EmulatorWindow {
 
         super(transform, width, height+20, 'Crossword');
         
-        this._hintsWindow = new EmulatorWindow({
-            offsetX: 10, offsetY: 10, zIndex: 20
-        }, 400, 200, 'Crossword Hints!');
+        // this._hintsWindow = new EmulatorWindow({
+        //     offsetX: 10, offsetY: 10, zIndex: 20
+        // }, 400, 200, 'Crossword Hints!');
         
-        this._crosswordHints = new CrosswordHints({
-            offsetX: 0, offsetY: this.titleBarHeight, zIndex: 0
-        }, this._hintsWindow.bitmap.width, [
-            '2. What was pacman\'s original name?',
-            '4. What is full of holes but still holds water?',
-            '5. What goes up when rain comes down?',
-            '6. What do you bury alive and dig up when dead?',
-        ], [
-            '1. What word is always pronounced incorrectly?',
-            '3. What color is pacman?',
-        ]);
+        // this._crosswordHints = new CrosswordHints({
+        //     offsetX: 0, offsetY: this.titleBarHeight, zIndex: 0
+        // }, this._hintsWindow.bitmap.width, [
+        //     '2. What was pacman\'s original name?',
+        //     '4. What is full of holes but still holds water?',
+        //     '5. What goes up when rain comes down?',
+        //     '6. What do you bury alive and dig up when dead?',
+        // ], [
+        //     '1. What word is always pronounced incorrectly?',
+        //     '3. What color is pacman?',
+        // ]);
         
-        this._hintsWindow.addChild(this._crosswordHints);
+        // this._hintsWindow.addChild(this._crosswordHints);
         
-        emulator.addElement(this._hintsWindow);
+        // emulator.addElement(this._hintsWindow);
         
         let maxRow = 0;
         let maxCol = 0;

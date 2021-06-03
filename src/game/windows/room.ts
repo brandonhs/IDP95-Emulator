@@ -63,6 +63,8 @@ export class RoomWindow extends EmulatorWindow {
     constructor(transform: IElementTransform, images: IRoomImages, topImages: ITopImages, crosswordWindow: CrosswordWindow, emulator: Emulator = globalThis.emulator) {
         super(transform, images.background.width, images.background.height, 'Pacman - mWAHAHAHHAHAHHA', true);
         
+        console.log(images.background.width, images.background.height);
+
         this._totalButtons = Object.keys(images).length;
         
         this._topImage = new EmulatorElement({

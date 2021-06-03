@@ -32,6 +32,7 @@ import { RoomWindow } from './game/windows/room';
 import { EmulatorTerminal } from './game/windows/terminal';
 import { GameTimer } from './emulator/elements/timer';
 import { StartWindow } from './game/windows/start';
+import { Puzzle1 } from './game/puzzles/puzzle1';
 
 document.body.onload = () => {
     var palette = BitmapRenderer.loadPalette();
@@ -67,11 +68,14 @@ document.body.onload = () => {
         // }, crosswordWindow);
         // emulator.addElement(roomWindow);
 
+        
         var startWindow = new StartWindow(EmulatorBitmap.loadImageFromHTML(await getImage(startButton), palette));
         emulator.addElement(startWindow);
         startWindow.onclose = () => {
             emulator.openDialog('You must\nplay\nto earn your\nfreedom');
         }
+        
+        emulator.addPuzzle(await Puzzle1.instance());
 
         new EmulatorPaletteView((() => {
             var div = document.createElement('div');
