@@ -16,16 +16,19 @@ export class EmulatorWindow extends EmulatorElement {
     private _subWindows: EmulatorWindow[];
 
     public noClose: boolean;
+    public noMove: boolean;
 
     private _titleBarHeight: number;
 
     onclose: () => void;
+    afterclose: () => void;
 
-    constructor(transform: IElementTransform, width: number, height: number, title: string = 'Window', noclose=false) {
+    constructor(transform: IElementTransform, width: number, height: number, title: string = 'Window', noclose=false, imovable=false) {
         super(transform, EmulatorBitmap.createEmpty(width, height));
         this._elements = [];
         this._subWindows = [];
 
+        this.noMove = imovable;
         this.noClose = noclose;
 
         this._titleFont = EmulatorFontManager.getFont(FontType.Normal)
@@ -47,6 +50,7 @@ export class EmulatorWindow extends EmulatorElement {
         this._dragging = false;
 
         this.onclose = () => { }
+        this.afterclose = () => { }
     }
 
     get subWindows() {
@@ -78,7 +82,7 @@ export class EmulatorWindow extends EmulatorElement {
     }
 
     handleMouseDrag(x: number, y: number, xoff: number, yoff: number) {
-        if (this._dragging) {
+        if (this._dragging && !this.noMove) {
             this._transform.offsetX += xoff;
             this._transform.offsetY += yoff;
         }
@@ -109,6 +113,7 @@ export class EmulatorWindow extends EmulatorElement {
         this._closeElement.handleMouseUp();
         if (this._closeElement.containsMouse(x, y, this)) {
             this.onclose();
+            this.afterclose();
         }
         this._dragging = false;
     }

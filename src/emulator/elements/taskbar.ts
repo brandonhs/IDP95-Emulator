@@ -9,8 +9,8 @@ export class EmulatorTaskBar extends EmulatorElement {
 
     constructor() {
         super({
-            offsetX: 0, offsetY: 600-20, zIndex: Infinity
-        }, EmulatorBitmap.createEmpty(800, 600).fill(18));
+            offsetX: 0, offsetY: 600-20, zIndex: Infinity-1
+        }, EmulatorBitmap.createEmpty(800, 600).fill(239));
         this._elements = [];
     }
 

@@ -18,6 +18,7 @@ import painting from '../assets/painting.png';
 import desk from '../assets/desk.png';
 import deskTop from '../assets/desk_top3.png';
 import supplies from '../assets/supplies.png';
+import startButton from '../assets/start_button.png';
 
 import { EmulatorWindow } from './emulator/elements/window';
 import { EmulatorTaskBar } from './emulator/elements/taskbar';
@@ -28,6 +29,9 @@ import { EmulatorFontManager, FontType } from './emulator/text/manager';
 import { MailWindow } from './game/windows/mail';
 import { CrosswordWindow } from './game/windows/crossword';
 import { RoomWindow } from './game/windows/room';
+import { EmulatorTerminal } from './game/windows/terminal';
+import { GameTimer } from './emulator/elements/timer';
+import { StartWindow } from './game/windows/start';
 
 document.body.onload = () => {
     var palette = BitmapRenderer.loadPalette();
@@ -35,48 +39,39 @@ document.body.onload = () => {
 
     globalThis.emulator = emulator;
 
-    emulator.addElement(new EmulatorTaskBar());
-
     (async function() {
-        // var backgroundImage = await getImage(background);
-        // var backgroundBitmap = EmulatorBitmap.loadImageFromHTML(backgroundImage, palette);
-        // emulator.setBackgroundImage(backgroundBitmap);
-
         EmulatorFontManager.addFont(FontType.Normal, await EmulatorFont.loadFont(<IFont>segoeUI16Data, palette));
         EmulatorFontManager.addFont(FontType.NormalBold, await EmulatorFont.loadFont(<IFont>arial16boldData, palette));
 
-        // let mailWindow = new MailWindow({
-        //     offsetX: 20, offsetY: 50, zIndex: 5
+        // var crosswordWindow = await CrosswordWindow.create({
+        //     offsetX: 10, offsetY: 225, zIndex: 40
         // });
-        // emulator.addElement(mailWindow);
 
-        var crosswordWindow = await CrosswordWindow.create({
-            offsetX: 10, offsetY: 225, zIndex: 40
-        });
+        // var roomWindow = new RoomWindow({
+        //     offsetX: 425, offsetY: 75, zIndex: 50
+        // }, {
+        //     background: EmulatorBitmap.loadImageFromHTML(await getImage(room), palette),
+        //     umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
+        //     carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
+        //     painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
+        //     plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
+        //     desk:       EmulatorBitmap.loadImageFromHTML(await getImage(desk), palette),
+        //     supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
+        // }, {
+        //     umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
+        //     carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
+        //     painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
+        //     plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
+        //     desk:       EmulatorBitmap.loadImageFromHTML(await getImage(deskTop), palette),
+        //     supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
+        // }, crosswordWindow);
+        // emulator.addElement(roomWindow);
 
-        var deskElement = new EmulatorElement({
-            offsetX: 0, offsetY: 20, zIndex: 10
-        }, EmulatorBitmap.loadImageFromHTML(await getImage(deskTop), palette));
-
-        var roomWindow = new RoomWindow({
-            offsetX: 425, offsetY: 75, zIndex: 50
-        }, {
-            background: EmulatorBitmap.loadImageFromHTML(await getImage(room), palette),
-            umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
-            carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
-            painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
-            plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
-            desk:       EmulatorBitmap.loadImageFromHTML(await getImage(desk), palette),
-            supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
-        }, {
-            umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), palette),
-            carpet:     EmulatorBitmap.loadImageFromHTML(await getImage(carpet), palette),
-            painting:   EmulatorBitmap.loadImageFromHTML(await getImage(painting), palette),
-            plant:      EmulatorBitmap.loadImageFromHTML(await getImage(plant), palette),
-            desk:       deskElement,
-            supplies:   EmulatorBitmap.loadImageFromHTML(await getImage(supplies), palette),
-        }, crosswordWindow);
-        emulator.addElement(roomWindow);
+        var startWindow = new StartWindow(EmulatorBitmap.loadImageFromHTML(await getImage(startButton), palette));
+        emulator.addElement(startWindow);
+        startWindow.onclose = () => {
+            emulator.openDialog('You must\nplay\nto earn your\nfreedom');
+        }
 
         new EmulatorPaletteView((() => {
             var div = document.createElement('div');
@@ -85,7 +80,6 @@ document.body.onload = () => {
         })(), emulator.renderer.palette, (id) => {
             console.log(id);
         });
-
         emulator.start();
     })();
 }

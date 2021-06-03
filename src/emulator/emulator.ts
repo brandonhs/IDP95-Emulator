@@ -1,20 +1,29 @@
+import { Demontavious } from '../game/characters/demontavious';
+import { DialogWindow } from '../game/windows/dialog';
+import { EmulatorTerminal } from '../game/windows/terminal';
 import { EmulatorBitmap } from './bitmap/bitmap';
 import { EmulatorElement } from './element';
+import { EmulatorTaskBar } from './elements/taskbar';
 import { EmulatorWindow } from './elements/window';
 import { BitmapRenderer } from './renderer';
 
 export class Emulator {
-
+    
     private _screenBitmap: EmulatorBitmap;
     private _elements: EmulatorElement[];
     private _renderer: BitmapRenderer;
     private _mouseDown: boolean;
     private _cycleCount: number;
+    private _demontavious: Demontavious;
+    
+    private _puzzleIndex: number = 0;
 
+    public terminal: EmulatorTerminal;
+    
     get cycles() {
         return this._cycleCount;
     }
-
+    
     constructor(palette = BitmapRenderer.loadPalette()) {
         this._screenBitmap = EmulatorBitmap.createEmpty(800, 600);
         this._screenBitmap.fill(15);
@@ -22,11 +31,15 @@ export class Emulator {
         this._renderer = new BitmapRenderer(palette, {
             width: 800, height: 600
         });
-
+        
+        this._demontavious = new Demontavious({
+            offsetX: this._screenBitmap.width-40, offsetY: this._screenBitmap.height-40, zIndex: Infinity
+        });
+        
         this._mouseDown = false;
-
+        
         var prevOffsetX = 0, prevOffsetY = 0;
-
+        
         this.renderer.canvas.onmousedown = (e) => {
             var maxIndex = 0;
             this._elements.forEach((v) => { if (v.zIndex !== Infinity) maxIndex = Math.max(v.zIndex, maxIndex) });
@@ -44,7 +57,7 @@ export class Emulator {
             prevOffsetX = e.offsetX;
             prevOffsetY = e.offsetY;
         }
-
+        
         window.onkeydown = (e: KeyboardEvent) => {
             this._elements.sort((a, b) => b.sort(a));
             for (let element of this._elements) {
@@ -55,7 +68,7 @@ export class Emulator {
             }
             e.preventDefault();
         };
-
+        
         this.renderer.canvas.onmouseup = (e) => {
             this._elements.sort((a, b) => b.sort(a));
             for (let element of this._elements) {
@@ -68,7 +81,7 @@ export class Emulator {
             prevOffsetX = e.offsetX;
             prevOffsetY = e.offsetY;
         }
-
+        
         this.renderer.canvas.onmousemove = (e) => {
             this._elements.sort((a, b) => b.sort(a));
             if (this._mouseDown) {
@@ -79,10 +92,35 @@ export class Emulator {
             prevOffsetX = e.offsetX;
             prevOffsetY = e.offsetY;
         }
+        
+        this.addElement(new EmulatorTaskBar());
+        //this.addElement(this._demontavious);
+    }
+    
+    focus(window: EmulatorWindow) {
+        let maxIndex = 0;
+        this._elements.forEach((v) => { if (v.zIndex !== Infinity) maxIndex = Math.max(v.zIndex, maxIndex) });
+        this._elements.sort((a, b) => b.sort(a));
+        window.setIndex(maxIndex + 1);
+    }
+
+    next() {
+        this._puzzleIndex++;
+        console.log('nextttt');
+    }
+
+    openDialog(text: string) {
+        var dialog = new DialogWindow(text);
+        this.addElement(dialog);
+    }
+    
+    speak(text: string) {
+        this._demontavious.speak(text);
     }
 
     removeElement(element: EmulatorElement) {
         let index = this._elements.indexOf(element);
+        if (index < 0) return;
         this._elements.splice(index, 1);
     }
 
@@ -119,12 +157,19 @@ export class Emulator {
         //this._screenBitmap = buffer;
     }
 
+    write(text: string) {
+        this.terminal.write(text);
+    }
+
     addElement(element: EmulatorElement) {
         this._elements.push(element);
         if (element instanceof EmulatorWindow && !element.noClose) {
             element.onclose = () => {
                 this._elements.splice(this._elements.indexOf(element), 1);
             }
+        }
+        if (element instanceof EmulatorTerminal) {
+            this.terminal = element;
         }
     }
 

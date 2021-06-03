@@ -76,10 +76,19 @@ export class EmulatorFont {
         return this._fontData.common.lineHeight;
     }
 
-    layout(text: string) {
+    layout(text: string, maxWidth=-1) {
         let characters: ICharacterData[] = [];
         let totalWidth = 0;
         let height = this._fontData.common.lineHeight;
+        let dataOffsetX = 0;
+        for (let data of characters) {
+            dataOffsetX += data.xadvance;
+            if (maxWidth > 0 && dataOffsetX > maxWidth) {
+                dataOffsetX = 0;
+                console.log(height);
+                height += this.lineHeight;
+            }
+        }
         for (let char of text) {
             let data = this.getCharacterData(char);
             if (data) {
@@ -90,10 +99,15 @@ export class EmulatorFont {
         let bitmap = EmulatorBitmap.createEmpty(totalWidth, height);
 
         let offsetX = 0;
+        let offsetY = 0;
         for (let data of characters) {
             let glyph = this._bitmap.getRegion(data.x, data.y, data.width, data.height);
-            bitmap = bitmap.blit(glyph, offsetX, data.yoffset);
+            bitmap = bitmap.blit(glyph, offsetX, data.yoffset + offsetY);
             offsetX += data.xadvance;
+            if (maxWidth > 0 && offsetX > maxWidth) {
+                offsetX = 0;
+                offsetY += this.lineHeight;
+            }
         }
         bitmap.applyTransparentColorFilter(0);
         return bitmap;

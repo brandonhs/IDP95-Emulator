@@ -3,6 +3,7 @@ import { EmulatorElement, IElementTransform } from "../../emulator/element";
 import { EmulatorButton } from "../../emulator/elements/button";
 import { EmulatorInbox } from "../../emulator/elements/inbox";
 import { EmulatorWindow } from "../../emulator/elements/window";
+import { Emulator } from "../../emulator/emulator";
 import { IBitmapPalette } from "../../emulator/renderer";
 import { EmulatorFontManager, FontType } from "../../emulator/text/manager";
 import { getImage } from "../../utils/requests";
@@ -23,7 +24,7 @@ export interface ITopImages {
     carpet: EmulatorBitmap,
     painting: EmulatorBitmap,
     plant: EmulatorBitmap,
-    desk: EmulatorElement,
+    desk: EmulatorBitmap,
     supplies: EmulatorBitmap,
 }
 
@@ -33,6 +34,7 @@ export class RoomWindow extends EmulatorWindow {
     private _selected: EmulatorButton;
     private _topImages: EmulatorBitmap[];
     private _totalButtons: number;
+    private _firstCrosswordView: boolean = false;
     private _i = 0;
     private _topImage: EmulatorElement;
 
@@ -44,36 +46,30 @@ export class RoomWindow extends EmulatorWindow {
         return this._i++;
     }
 
-    addButton(button: EmulatorButton, topImage: EmulatorBitmap | EmulatorElement = undefined, onclick: () => void = undefined) {
+    addButton(button: EmulatorButton, topImage: EmulatorBitmap = undefined, onclick: () => void = undefined) {
         this._searchables.push(button);
         button.id = this.getNextButtonId();
         button.onclick = () => {
+            if (topImage) {
+                this._topImage._bitmap = topImage;
+                this._topImage.show();
+            }
             if (onclick) {
                 onclick();
-            }
-            if (topImage) {
-                if (topImage instanceof EmulatorBitmap) {
-                    this._topImage._bitmap = topImage;
-                    this._topImage.show();
-                } else {
-                    this._elements.splice(this._elements.indexOf(this._topImage), 1);
-                    topImage.show();
-                    this._topImage = topImage;
-                    this.addChild(this._topImage);
-                }
             }
         }
     }
 
-    constructor(transform: IElementTransform, images: IRoomImages, topImages: ITopImages, crosswordWindow: CrosswordWindow) {
+    constructor(transform: IElementTransform, images: IRoomImages, topImages: ITopImages, crosswordWindow: CrosswordWindow, emulator: Emulator = globalThis.emulator) {
         super(transform, images.background.width, images.background.height, 'Pacman - mWAHAHAHHAHAHHA', true);
         
         this._totalButtons = Object.keys(images).length;
         
         this._topImage = new EmulatorElement({
             offsetX: 0, offsetY: 20, zIndex: 100
-        }, topImages.desk.bitmap);
+        }, topImages.desk);
         this._topImage.hide();
+
         
         this.setBackground(images.background);
         
@@ -100,6 +96,10 @@ export class RoomWindow extends EmulatorWindow {
         }, images.desk), topImages.desk, () => {
             if (!this._addedCrossword)
                 emulator.addElement(crosswordWindow);
+            crosswordWindow.afterclose = () => {
+                this._addedCrossword = false; 
+                this._closeElement.onclick();
+            }
             this._addedCrossword = true;
         });
         
@@ -113,6 +113,10 @@ export class RoomWindow extends EmulatorWindow {
 
         this._closeElement.onclick = () => {
             this._topImage.hide();
+            if (this._addedCrossword) {
+                emulator.removeElement(crosswordWindow);
+                this._addedCrossword = false; 
+            }
         }
         
         for (let button of this._hintElements) {
