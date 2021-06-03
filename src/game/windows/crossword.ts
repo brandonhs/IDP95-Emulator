@@ -113,13 +113,17 @@ export class CrosswordWindow extends EmulatorWindow {
     private _maxIndex: number;
     private _boxIndices: number[];
 
+    private _completed: boolean;
+
     constructor(transform: IElementTransform, crosswordSvg: XMLDocument) {
         var svg = crosswordSvg.getElementsByTagName('svg')[0];
         var width = Math.floor(parseFloat(svg.getAttribute('data-width')));
         var height = Math.floor(parseFloat(svg.getAttribute('data-height')));
 
         super(transform, width, height+20, 'Crossword');
-        
+
+        this._completed = false;
+
         // this._hintsWindow = new EmulatorWindow({
         //     offsetX: 10, offsetY: 10, zIndex: 20
         // }, 400, 200, 'Crossword Hints!');
@@ -198,6 +202,31 @@ export class CrosswordWindow extends EmulatorWindow {
             new Array(maxCol+1).fill(null).map(() => ' '));
     }
 
+    check() {
+        var correct = [
+            '      i    '.split(''),
+            'puckman    '.split(''),
+            '      c  y '.split(''),
+            '    sponge '.split(''),
+            '      r  l '.split(''),
+            '   umbrella'.split(''),
+            '      e  o '.split(''),
+            '      c  w '.split(''),
+            '      t    '.split(''),
+            '     plant '.split(''),
+            '      y    '.split(''),
+        ]
+        var valid = true;
+        for (let i = 0; i < correct.length; i++) {
+            for (let j = 0; j < correct[i].length; j++) {
+                let c = correct[i][j];
+                let r = this._letters[i][j];
+                valid = valid && (c === r);
+            }
+        }
+        return valid;
+    }
+
     sendKey(key: string, dif=2) {
         if (this._selectedBox) {
             if (key.length <= 1) {
@@ -243,6 +272,9 @@ export class CrosswordWindow extends EmulatorWindow {
                 this.sendKey(this._letters[this._selectedBox.row][this._selectedBox.col] || ' ', -2);
             } else if (key === 'ArrowRight') {
                 this.sendKey(this._letters[this._selectedBox.row][this._selectedBox.col] || ' ', 2);
+            }
+            if (this.check()) {
+                this._completed = true;
             }
         }
     }

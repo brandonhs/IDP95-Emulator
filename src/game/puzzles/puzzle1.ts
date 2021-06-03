@@ -37,7 +37,7 @@ export class Puzzle1 implements IPuzzle {
         });
 
         elements.push(new RoomWindow({
-            offsetX: Math.floor(emulator.bitmap.width / 2 - 150), offsetY: Math.floor(emulator.bitmap.height / 2 - 150), zIndex: 50
+            offsetX: Math.floor(emulator.bitmap.width / 2 - 150)+100, offsetY: Math.floor(emulator.bitmap.height / 2 - 150)+50, zIndex: 50
         }, {
             background: EmulatorBitmap.loadImageFromHTML(await getImage(room), emulator.renderer.palette),
             umbrella:   EmulatorBitmap.loadImageFromHTML(await getImage(umbrella), emulator.renderer.palette),
